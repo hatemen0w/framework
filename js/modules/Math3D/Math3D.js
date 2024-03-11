@@ -106,7 +106,7 @@ class Math3D {
             x /= polygon.points.length;
             y /= polygon.points.length;
             z /= polygon.points.length;
-            polygon[name] = math.sqrt(endPoint.x - x) ** 2 + (endPoint.y - y) ** 2 + (endPoint.z - z) ** 2;
+            polygon[name] = Math.sqrt(endPoint.x - x) ** 2 + (endPoint.y - y) ** 2 + (endPoint.z - z) ** 2;
         })
     }
 
