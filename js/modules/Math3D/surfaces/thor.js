@@ -6,6 +6,7 @@
 Surfaces.prototype.thor = (count = 20, R = 10, r = 5) => {
     const points = [];
     const edges = [];
+    const polygons = []
     // about points
     const da = Math.PI * 2 / count;
     for (let phi = 0; phi < Math.PI * 2; phi += da) {
@@ -32,5 +33,24 @@ Surfaces.prototype.thor = (count = 20, R = 10, r = 5) => {
         }
     }
 
-    return new Surface(points, edges);
+    for (let i = 0; i < points.length; i++) {
+        if (points[i + count + 1]) {
+            polygons.push(new Polygon([
+                i,
+                i + 1,
+                i + count + 1,
+                i+ count
+            ], '#fff000'));
+        }
+        else if (points[i + 1]){
+            polygons.push(new Polygon([
+                i,
+                (i + 1) % count,
+                i + 1,
+                i % count
+            ], '#0ff000'))
+        }
+    }
+
+    return new Surface(points, edges, polygons);
 }

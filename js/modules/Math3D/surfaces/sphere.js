@@ -1,6 +1,7 @@
 Surfaces.prototype.sphere = (count = 20, radius = 10) => {
     const points = [];
     const edges = [];
+    const polygons = []
     // about points
     const thetaDelta = Math.PI / count;
     const phiDelta = (Math.PI * 2) / count;
@@ -30,5 +31,17 @@ Surfaces.prototype.sphere = (count = 20, radius = 10) => {
         }
     }
 
-    return new Surface(points, edges);
+    for (let i = 0; i < points.length; i++) {
+        if (points[i + count + 1]) {
+            polygons.push(new Polygon([
+                i,
+                i + 1,
+                i + count + 1,
+                i + count
+            ], '#fff000'));
+        }
+    }
+
+
+    return new Surface(points, edges, polygons);
 }

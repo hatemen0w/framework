@@ -46,7 +46,7 @@ function Graph(options) {
         context.closePath();
     }
 
-    this.point = (x, y, color = 'black', size = 3) => {
+    this.point = (x, y, color = 'black', size = 2) => {
         context.beginPath();
         context.strokeStyle = color;
         context.fillStyle = color;

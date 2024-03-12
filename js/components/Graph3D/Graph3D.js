@@ -46,6 +46,10 @@ class Graph3D extends Component {
             'change',
             () => this.renderScene()
         )
+        document.getElementById('polygons').addEventListener(
+            'change',
+            () => this.renderScene()
+        )
     }
 
     mouseup() {
@@ -84,6 +88,7 @@ class Graph3D extends Component {
 
     renderScene() {
         this.graph.clear();
+        
         if (document.getElementById('points').checked) {
             this.scene.points.forEach(point => this.graph.point(this.math3D.xs(point), this.math3D.ys(point)));
         }
@@ -95,20 +100,10 @@ class Graph3D extends Component {
             });
         }
         if (document.getElementById('polygons').checked) {
-            this.scene.polygons.forEach(polygon => {
-                const points = polygon.points.map(index => 
-                    new Point(this.math3D.xs(this.scene.points[index]),
-                    this.math3D.ys(this.scene.points[index])));
-                this.graph.polygon(points, polygon.color);
-            });
+            this.scene.edges.forEach(polygons => {
+
+            })
         }
-        this.math3D.calcDistance(this.scene, WIN.CAMERA, 'distance');
-        this.math3D.sortByArtistAlgorithm(this.scene);
-        this.scene.polygons.forEach(polygon => {
-            const points = polygon.points.map(index => 
-                new Point(this.math3D.xs(this.scene.points[index]),
-                this.math3D.ys(this.scene.points[index])));
-            this.graph.polygon(points, polygon.color);
-        });
+        
     }
 }
