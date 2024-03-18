@@ -1,5 +1,5 @@
 class Math3D {
-    constructor({ WIN }) {
+    constructor({WIN}) {
         this.WIN = WIN;
     }
 
@@ -8,7 +8,7 @@ class Math3D {
         const z0 = this.WIN.CAMERA.z;
         const x0 = this.WIN.CAMERA.x;
 
-        return (point.x - x0) / (point.z - z0) * (zs - z0) + x0;
+        return(point.x - x0) / (point.z - z0) * (zs - z0) + x0;
     }
 
     ys(point) {
@@ -27,7 +27,7 @@ class Math3D {
             }
             a[i] = b;
         }
-        return a;
+        return a; 
     }
 
     zoom(delta, point) {
@@ -106,11 +106,16 @@ class Math3D {
             x /= polygon.points.length;
             y /= polygon.points.length;
             z /= polygon.points.length;
-            polygon[name] = Math.sqrt(endPoint.x - x) ** 2 + (endPoint.y - y) ** 2 + (endPoint.z - z) ** 2;
-        })
+            polygon[name] = Math.sqrt((endPoint.x - x)**2 + (endPoint.y - y)**2 + (endPoint.z - z)**2);
+        });
     }
 
-    sortByArtistAlgorithm(surface){
-        surface.polygons.sort((a,b)=>(a.distance<b.distance)?1:-1);
+    sortByArtistAlgorithm(surface) {
+        surface.polygons.sort((a, b) => (a.distance < b.distance)? 1 : -1);
+    }
+
+    calcIllumination(distance, lumen) {
+        const illum = distance ? lumen / distance**2 : 1;
+        return illum > 1 ? 1 : illum;
     }
 }

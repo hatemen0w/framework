@@ -1,5 +1,5 @@
 Surfaces.prototype.cube = () => {
-    const points = [
+    return new Surface([
         new Point(10, 10, 10),
         new Point(10, -10, 10),
         new Point(-10, -10, 10),
@@ -8,8 +8,7 @@ Surfaces.prototype.cube = () => {
         new Point(10, 10, -10),
         new Point(10, -10, -10),
         new Point(-10, -10, -10)
-    ]
-    const edges = [
+    ], [
         new Edge(0, 1),
         new Edge(1, 2),
         new Edge(2, 3),
@@ -22,10 +21,12 @@ Surfaces.prototype.cube = () => {
         new Edge(5, 6),
         new Edge(6, 7),
         new Edge(7, 4)
-    ];
-
-    const polygons = [
-        new Polygon([0,1,2,3],'ff0000')
-    ]
-    return new Surface(points,edges,polygons)
+    ], [
+        new Polygon([0, 1, 2, 3], '#993333'),
+        new Polygon([4, 5, 6, 7], '#993333'),
+        new Polygon([0, 1, 6, 5], '#993333'),
+        new Polygon([3, 2, 7, 4], '#993333'),
+        new Polygon([0, 3, 4, 5], '#993333'),
+        new Polygon([1, 2, 7, 6], '#993333')
+    ]);
 }

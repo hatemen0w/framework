@@ -35,7 +35,7 @@ Surfaces.prototype.ellipse = (count = 20, a = 10, b = 5) => {
                 i + 1,
                 i + count + 1,
                 i + count
-            ], '#fff000'));
+            ], '#993333'));
         }
     }
     return new Surface(points, edges, polygons);

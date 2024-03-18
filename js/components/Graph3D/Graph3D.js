@@ -18,9 +18,11 @@ class Graph3D extends Component {
                 mousedown: () => this.mousedown(),
             }
         });
-        this.math3D = new Math3D({ WIN });
+        this.math3D = new Math3D({WIN});
         this.surfaces = new Surfaces;
-        this.scene = this.surfaces.sphere();
+        this.scene = this.surfaces.thor();
+        this.WIN = WIN;
+        this.LIGHT = new Light(30, 15, 20, 1000);
         this.renderScene();
     }
 
@@ -88,7 +90,22 @@ class Graph3D extends Component {
 
     renderScene() {
         this.graph.clear();
-        
+        if (document.getElementById('polygons').checked) {
+            this.math3D.calcDistance(this.scene, this.WIN.CAMERA, 'distance');
+            this.math3D.calcDistance(this.scene, this.LIGHT, 'lumen');
+            this.math3D.sortByArtistAlgorithm(this.scene);
+            this.scene.polygons.forEach(polygon => {
+                const points = polygon.points.map(index => 
+                    new Point(this.math3D.xs(this.scene.points[index]),
+                    this.math3D.ys(this.scene.points[index])));
+                const lumen = this.math3D.calcIllumination(polygon.lumen, this.LIGHT.lumen);
+                let {r, g, b} = polygon.color;
+                r = Math.round(r * lumen);
+                g = Math.round(g * lumen);
+                b = Math.round(b * lumen);
+                this.graph.polygon(points, polygon.rgbToHex(r, g, b));
+            });
+        }
         if (document.getElementById('points').checked) {
             this.scene.points.forEach(point => this.graph.point(this.math3D.xs(point), this.math3D.ys(point)));
         }
@@ -99,11 +116,5 @@ class Graph3D extends Component {
             this.graph.line(this.math3D.xs(point1), this.math3D.ys(point1), this.math3D.xs(point2), this.math3D.ys(point2));
             });
         }
-        if (document.getElementById('polygons').checked) {
-            this.scene.edges.forEach(polygons => {
-
-            })
-        }
-        
     }
 }
