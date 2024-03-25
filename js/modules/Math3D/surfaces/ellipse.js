@@ -1,4 +1,4 @@
-Surfaces.prototype.ellipse = (count = 20, a = 10, b = 5) => {
+Surfaces.prototype.ellipse = ({ count = 20, a = 10, b = 5 }) => {
     const points = [];
     const edges = [];
     const polygons = [];

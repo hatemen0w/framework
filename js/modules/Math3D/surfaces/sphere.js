@@ -1,4 +1,4 @@
-Surfaces.prototype.sphere = (count = 20, radius = 10) => {
+Surfaces.prototype.sphere = ({ count = 20, radius = 10, color = '#ff3333' }) => {
     const points = [];
     const edges = [];
     const polygons = []
@@ -38,7 +38,7 @@ Surfaces.prototype.sphere = (count = 20, radius = 10) => {
                 i + 1,
                 i + count + 1,
                 i + count
-            ], '#993333'));
+            ], color));
         }
     }
 

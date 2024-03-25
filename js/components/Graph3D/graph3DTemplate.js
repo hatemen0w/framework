@@ -5,12 +5,12 @@ Template.prototype.graph3DTemplate = () => `<canvas id='canvasGraph3D' class='as
         <option value = 'ellipse'>Эллипс</option>    
         <option value = 'thor'>Тор</option>    
         <option value = 'cube'>Куб</option>
-        <option value = 'giperCil'>Гиперболический цилиндр</option>
+        <option value = 'hyperbolicCylinder'>Гиперболический цилиндр</option>
     <select>
 </div>
 <div>
-    <input type = 'checkbox' id = 'edges' checked>Рисовать рёбра</input>
-    <input type = 'checkbox' id = 'points' checked>Рисовать точки</input>    
-    <input type = 'checkbox' id = 'polygons' checked>Рисовать полигоны</input>  
+    <input class='customSurface' data-custom='drawPoints' type='checkbox' id ='points' checked>Рисовать точки</input>    
+    <input class='customSurface' data-custom='drawEdges' type='checkbox' id ='edges' checked>Рисовать рёбра</input>
+    <input class='customSurface' data-custom='drawPolygons' type='checkbox' id ='polygons' checked>Рисовать полигоны</input>
 </div>
-    `    
+`;

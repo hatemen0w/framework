@@ -18,11 +18,23 @@ class Graph3D extends Component {
                 mousedown: () => this.mousedown(),
             }
         });
-        this.math3D = new Math3D({WIN});
+        this.math3D = new Math3D({ WIN });
         this.surfaces = new Surfaces;
-        this.scene = this.surfaces.thor();
+        this.scene = this.SolarSystem();
         this.WIN = WIN;
-        this.LIGHT = new Light(30, 15, 20, 1000);
+        this.LIGHT = new Light(-40, 15, -10, 1000);
+        this.state = {
+            animationsEnabled: true // Изначально анимации включены
+        };
+        this.drawPoints = true;
+        this.drawEdges = true;
+        this.drawPolygons = true;
+
+        setInterval(() => {
+            this.scene.forEach(surface => surface.doAnimation(this.math3D));
+            this.renderScene();
+        }, 50)
+
         this.renderScene();
     }
 
@@ -39,19 +51,16 @@ class Graph3D extends Component {
         document.getElementById('selectFigure').addEventListener(
             'change',
             () => this.selectFigure()
-        )
-        document.getElementById('points').addEventListener(
-            'change',
-            () => this.renderScene()
-        )
-        document.getElementById('edges').addEventListener(
-            'change',
-            () => this.renderScene()
-        )
-        document.getElementById('polygons').addEventListener(
-            'change',
-            () => this.renderScene()
-        )
+        );
+        document.querySelectorAll('.customSurface').forEach(checkbox =>
+            checkbox.addEventListener(
+                'change',
+                (event) => {
+                    this[event.target.dataset.custom] = event.target.checked;
+                    this.renderScene();
+                }
+            )
+        );
     }
 
     mouseup() {
@@ -64,18 +73,25 @@ class Graph3D extends Component {
 
     wheel(event) {
         event.preventDefault();
-        const delta = (event.wheelDelta > 0)?1.2:0.8;
-        this.scene.points.forEach(point => this.math3D.zoom(delta, point));
+        const delta = (event.wheelDelta > 0) ? 1.2 : 0.8;
+        const matrix = this.math3D.zoom(delta);
+        this.scene.forEach(surface =>
+            surface.points.forEach(point => this.math3D.transform(matrix, point))
+        );
         this.renderScene();
     }
 
     mousemove(event) {
         if (this.canMove) {
             const gradus = Math.PI / 180 / 4;
-            this.scene.points.forEach(point => {
-                this.math3D.rotateOx(point, (this.dy - event.offsetY) * gradus);
-                this.math3D.rotateOy(point, (this.dx - event.offsetX) * gradus);
-            });
+            const matrixOx = this.math3D.rotateOx((this.dy - event.offsetY) * gradus);
+            const matrixOy = this.math3D.rotateOy((this.dx - event.offsetX) * gradus);
+            this.scene.forEach(surface =>
+                surface.points.forEach(point => {
+                    this.math3D.transform(matrixOx, point);
+                    this.math3D.transform(matrixOy, point);
+                })
+            );
             this.renderScene();
         }
         this.dx = event.offsetX;
@@ -84,37 +100,74 @@ class Graph3D extends Component {
 
     selectFigure() {
         const figure = document.getElementById('selectFigure').value;
-        this.scene = this.surfaces[figure]();
+        this.scene = [this.surfaces[figure]({})];
         this.renderScene();
     }
 
+    SolarSystem() {
+        const Earth = this.surfaces.sphere({});
+        Earth.addAnimation('rotateOy', 0.1);
+        const Moon = this.surfaces.cube({color: '#e6e6fa'});
+        Moon.addAnimation('rotateOx', 0.2);
+        Moon.addAnimation('rotateOz', 0.05);
+        return [Earth, Moon];
+    }
+
+
     renderScene() {
         this.graph.clear();
-        if (document.getElementById('polygons').checked) {
-            this.math3D.calcDistance(this.scene, this.WIN.CAMERA, 'distance');
-            this.math3D.calcDistance(this.scene, this.LIGHT, 'lumen');
-            this.math3D.sortByArtistAlgorithm(this.scene);
-            this.scene.polygons.forEach(polygon => {
-                const points = polygon.points.map(index => 
-                    new Point(this.math3D.xs(this.scene.points[index]),
-                    this.math3D.ys(this.scene.points[index])));
+        if (this.drawPolygons) {
+            const polygons = [];
+            this.scene.forEach((surface, index) => {
+                this.math3D.calcDistance(surface, this.WIN.CAMERA, 'distance');
+                this.math3D.calcDistance(surface, this.LIGHT, 'lumen');
+                surface.polygons.forEach(polygon => {
+                    polygon.index = index;
+                    polygons.push(polygon);
+                });
+            });
+
+            this.math3D.sortByArtistAlgorithm(polygons);
+
+            polygons.forEach(polygon => {
+                const points = polygon.points.map(index =>
+                    new Point(
+                        this.math3D.xs(this.scene[polygon.index].points[index]),
+                        this.math3D.ys(this.scene[polygon.index].points[index])
+                    )
+                );
                 const lumen = this.math3D.calcIllumination(polygon.lumen, this.LIGHT.lumen);
-                let {r, g, b} = polygon.color;
+                let { r, g, b } = polygon.color;
                 r = Math.round(r * lumen);
                 g = Math.round(g * lumen);
                 b = Math.round(b * lumen);
                 this.graph.polygon(points, polygon.rgbToHex(r, g, b));
             });
         }
-        if (document.getElementById('points').checked) {
-            this.scene.points.forEach(point => this.graph.point(this.math3D.xs(point), this.math3D.ys(point)));
+        if (this.drawPoints) {
+            this.scene.forEach(surface =>
+                surface.points.forEach(
+                    point => this.graph.point(
+                        this.math3D.xs(point),
+                        this.math3D.ys(point)
+                    )
+                )
+            );
         }
-        if (document.getElementById('edges').checked) {
-            this.scene.edges.forEach(edge => {
-            const point1 = this.scene.points[edge.p1];
-            const point2 = this.scene.points[edge.p2];
-            this.graph.line(this.math3D.xs(point1), this.math3D.ys(point1), this.math3D.xs(point2), this.math3D.ys(point2));
-            });
+        if (this.drawEdges) {
+            this.scene.forEach(surface =>
+                surface.edges.forEach(edge => {
+                    const point1 = surface.points[edge.p1];
+                    const point2 = surface.points[edge.p2];
+                    this.graph.line(
+                        this.math3D.xs(point1), this.math3D.ys(point1),
+                        this.math3D.xs(point2), this.math3D.ys(point2)
+                    );
+                })
+            );
         }
+        // if (this.state.animationsEnabled) {
+        //     this.scene.forEach(surface => surface.doAnimation(this.math3D));
+        // }
     }
 }
