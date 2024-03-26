@@ -22,11 +22,11 @@ Surfaces.prototype.cube = () => {
         new Edge(6, 7),
         new Edge(7, 4)
     ], [
-        new Polygon([0, 1, 2, 3], '#993333'),
-        new Polygon([4, 5, 6, 7], '#993333'),
-        new Polygon([0, 1, 6, 5], '#993333'),
-        new Polygon([3, 2, 7, 4], '#993333'),
-        new Polygon([0, 3, 4, 5], '#993333'),
-        new Polygon([1, 2, 7, 6], '#993333')
+        new Polygon([0, 1, 2, 3], '#013220'),
+        new Polygon([4, 5, 6, 7], '#013220'),
+        new Polygon([0, 1, 6, 5], '#013220'),
+        new Polygon([3, 2, 7, 4], '#013220'),
+        new Polygon([0, 3, 4, 5], '#013220'),
+        new Polygon([1, 2, 7, 6], '#013220')
     ]);
 }

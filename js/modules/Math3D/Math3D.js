@@ -105,7 +105,7 @@ class Math3D {
     }
 
     sortByArtistAlgorithm(polygons) {
-        polygons.sort((a, b) => (a.distance < b.distance)? 1 : -1);
+        polygons.sort((a, b) => b.distance - a.distance);
     }
 
     calcIllumination(distance, lumen) {

@@ -1,4 +1,10 @@
-Surfaces.prototype.sphere = ({ count = 20, radius = 10, color = '#ff3333' }) => {
+Surfaces.prototype.sphere = ({
+    count = 20,
+    radius = 10,
+    color = '#ff3333',
+    x0 = 0,
+    y0 = 0,
+    z0 = 0 }) => {
     const points = [];
     const edges = [];
     const polygons = []
@@ -43,5 +49,5 @@ Surfaces.prototype.sphere = ({ count = 20, radius = 10, color = '#ff3333' }) => 
     }
 
 
-    return new Surface(points, edges, polygons);
+    return new Surface(points, edges, polygons, new Point(x0,y0,z0));
 }
