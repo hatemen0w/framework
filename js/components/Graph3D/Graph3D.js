@@ -1,13 +1,14 @@
-window.requestAnimFrame = (function () {
+window.requestAnimationFrame = (function () {
     return window.requestAnimationFrame ||
         window.webkitRequestAnimationFrame ||
         window.mozRequestAnimationFrame ||
         window.oRequestAnimationFrame ||
         window.msRequestAnimationFrame ||
-        function(callbacks) {
-        window.setTimeout(callback, 1000 / 60);
-    };
-})
+        function (callback) {
+            window.setTimeout(callback, 1000 / 60);
+        };
+})();
+
 
 class Graph3D extends Component {
     constructor(options) {
@@ -33,16 +34,16 @@ class Graph3D extends Component {
         this.surfaces = new Surfaces;
         this.scene = this.SolarSystem();
         this.WIN = WIN;
-        this.LIGHT = new Light(-40, 15, -10, 1000);
-        this.drawPoints = false;
-        this.drawEdges = false;
+        this.LIGHT = new Light(-40, 15, -10, 1500);
+
+        this.drawPoints = true;
+        this.drawEdges = true;
         this.drawPolygons = true;
 
         setInterval(() => {
             this.scene.forEach(surface => surface.doAnimation(this.math3D));
-            this.renderScene();
-        }, 50);
-
+        }, 50)
+        
         let FPS = 0;
         let countFPS = 0;
         let timestamp = Date.now();
@@ -55,9 +56,11 @@ class Graph3D extends Component {
                 countFPS = 0;
                 timestamp = currentTimestamp;
             }
+
             this.renderScene(FPS);
-            requestAnimFrame(renderLoop)
+            requestAnimationFrame(renderLoop);
         }
+
         renderLoop();
     }
 
@@ -80,7 +83,6 @@ class Graph3D extends Component {
                 'change',
                 (event) => {
                     this[event.target.dataset.custom] = event.target.checked;
-                    this.renderScene();
                 }
             )
         );
@@ -101,7 +103,6 @@ class Graph3D extends Component {
         this.scene.forEach(surface =>
             surface.points.forEach(point => this.math3D.transform(matrix, point))
         );
-        this.renderScene();
     }
 
     mousemove(event) {
@@ -109,11 +110,12 @@ class Graph3D extends Component {
             const gradus = Math.PI / 180 / 4;
             const matrixOx = this.math3D.rotateOx((this.dy - event.offsetY) * gradus);
             const matrixOy = this.math3D.rotateOy((this.dx - event.offsetX) * gradus);
-            const matrix = this.math3D.getTransform(matrixOx, matrixOy)
             this.scene.forEach(surface =>
-                surface.points.forEach(point => this.math3D.transform(matrix, point))
+                surface.points.forEach(point => {
+                    this.math3D.transform(matrixOx, point);
+                    this.math3D.transform(matrixOy, point);
+                })
             );
-            this.renderScene();
         }
         this.dx = event.offsetX;
         this.dy = event.offsetY;
@@ -122,21 +124,23 @@ class Graph3D extends Component {
     selectFigure() {
         const figure = document.getElementById('selectFigure').value;
         this.scene = [this.surfaces[figure]({})];
-        this.renderScene();
     }
 
     SolarSystem() {
-        const Earth = this.surfaces.sphere({ color: '00ffff' });
-        Earth.addAnimation('rotateOy', 0.1);
-        const Moon = this.surfaces.sphere({ radius: 5, y0: 16 });
-        Moon.addAnimation('rotateOx', 0.2,);
-        Moon.addAnimation('rotateOz', 0.05, Earth.center);
-        return [Earth, Moon];
+        const Sun = this.surfaces.sphere({color: '#ffff00', radius: 10})
+        Sun.addAnimation('rotateOy', 0.01);
+        Sun.addAnimation('rotateOz', 0.01);
+        const Earth = this.surfaces.sphere({color: '#0022ff', radius: 5, x0: 20});
+        Earth.addAnimation('rotateOy', 0.03, Sun.center);
+        Earth.addAnimation('rotateOz', 0.05);
+        const Moon = this.surfaces.sphere({color: '#969ba3', radius:2, x0: Earth.center.x, y0: Earth.center.y, z0: Earth.center.z + 8});
+        Moon.addAnimation('rotateOx', 0.1, Earth.center);
+        Moon.addAnimation('rotateOy', 0.03, Sun.center);
+        return [Sun, Earth, Moon];
     }
 
-
     renderScene(FPS) {
-        console.log(FPS)
+        console.log(FPS);
         this.graph.clear();
         if (this.drawPolygons) {
             const polygons = [];
@@ -188,8 +192,5 @@ class Graph3D extends Component {
                 })
             );
         }
-        // if (this.state.animationsEnabled) {
-        //     this.scene.forEach(surface => surface.doAnimation(this.math3D));
-        // }
     }
 }
