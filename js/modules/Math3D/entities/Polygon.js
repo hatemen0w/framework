@@ -5,6 +5,7 @@ class Polygon {
         this.distance = 0;
         this.lumen = 1;
         this.index = 0;
+        this.visibility = true;
     }
 
     hexToRgb(hex) {

@@ -14,9 +14,9 @@ Surfaces.prototype.sphere = ({
 
     for (let theta = 0; theta <= Math.PI; theta += thetaDelta) {
         for (let phi = 0; phi < Math.PI * 2; phi += phiDelta) {
-            const x = radius * Math.sin(theta) * Math.cos(phi);
-            const y = radius * Math.sin(theta) * Math.sin(phi);
-            const z = radius * Math.cos(theta);
+            const x = x0 + radius * Math.sin(theta) * Math.cos(phi);
+            const y = y0 + radius * Math.sin(theta) * Math.sin(phi);
+            const z = z0 + radius * Math.cos(theta);
 
             points.push(new Point(x, z, y));
         }
@@ -49,5 +49,5 @@ Surfaces.prototype.sphere = ({
     }
 
 
-    return new Surface(points, edges, polygons, new Point(x0,y0,z0));
+    return new Surface(points, edges, polygons, new Point(x0, y0, z0));
 }

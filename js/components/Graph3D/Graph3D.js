@@ -36,8 +36,8 @@ class Graph3D extends Component {
         this.WIN = WIN;
         this.LIGHT = new Light(-40, 15, -10, 1500);
 
-        this.drawPoints = true;
-        this.drawEdges = true;
+        this.drawPoints = false;
+        this.drawEdges = false;
         this.drawPolygons = true;
 
         setInterval(() => {
@@ -130,12 +130,12 @@ class Graph3D extends Component {
         const Sun = this.surfaces.sphere({color: '#ffff00', radius: 10})
         Sun.addAnimation('rotateOy', 0.01);
         Sun.addAnimation('rotateOz', 0.01);
-        const Earth = this.surfaces.sphere({color: '#0022ff', radius: 5, x0: 20});
-        Earth.addAnimation('rotateOy', 0.03, Sun.center);
-        Earth.addAnimation('rotateOz', 0.05);
-        const Moon = this.surfaces.sphere({color: '#969ba3', radius:2, x0: Earth.center.x, y0: Earth.center.y, z0: Earth.center.z + 8});
+        const Earth = this.surfaces.sphere({color: '#00ffff', radius: 3, x0: 20});
+        Earth.addAnimation('rotateOy', 0.1, Sun.center);
+        //Earth.addAnimation('rotateOz', 0.05,Earth.center);
+        const Moon = this.surfaces.sphere({color: '#808080', radius:1, x0: Earth.center.x, y0: Earth.center.y, z0: Earth.center.z + 8});
         Moon.addAnimation('rotateOx', 0.1, Earth.center);
-        Moon.addAnimation('rotateOy', 0.03, Sun.center);
+        Moon.addAnimation('rotateOz', 0.03, Earth.center);
         return [Sun, Earth, Moon];
     }
 
@@ -147,6 +147,9 @@ class Graph3D extends Component {
             this.scene.forEach((surface, index) => {
                 this.math3D.calcDistance(surface, this.WIN.CAMERA, 'distance');
                 this.math3D.calcDistance(surface, this.LIGHT, 'lumen');
+                this.math3D.calcCenter(surface);
+                this.math3D.calcRadius(surface);
+                this.math3D.calcVisibility(surface,this.WIN.CAMERA);
                 surface.polygons.forEach(polygon => {
                     polygon.index = index;
                     polygons.push(polygon);
@@ -156,18 +159,20 @@ class Graph3D extends Component {
             this.math3D.sortByArtistAlgorithm(polygons);
 
             polygons.forEach(polygon => {
+                if(polygon.visibility){
                 const points = polygon.points.map(index =>
                     new Point(
                         this.math3D.xs(this.scene[polygon.index].points[index]),
                         this.math3D.ys(this.scene[polygon.index].points[index])
                     )
                 );
-                const lumen = this.math3D.calcIllumination(polygon.lumen, this.LIGHT.lumen);
+                const {isShadow, dark} = this.math3D.calcShadow(polygon, this.scene, this.LIGHT);
+                const lumen = this.math3D.calcIllumination(polygon.lumen, this.LIGHT.lumen * (isShadow ? dark : 1));
                 let { r, g, b } = polygon.color;
                 r = Math.round(r * lumen);
                 g = Math.round(g * lumen);
                 b = Math.round(b * lumen);
-                this.graph.polygon(points, polygon.rgbToHex(r, g, b));
+                this.graph.polygon(points, polygon.rgbToHex(r, g, b));}
             });
         }
         if (this.drawPoints) {
